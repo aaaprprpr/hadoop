@@ -8,7 +8,7 @@ public class Main {
         // dfs.downloadFile("/file1.txt", "./test");
         // dfs.cat("/file1.txt");
         // dfs.mkdir("/test/a/a/a/a/a/a/a/a/a");
-        dfs.rmdir("/test");
+        // dfs.rmdir("/test");
 
 
 

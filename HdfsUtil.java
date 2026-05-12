@@ -12,8 +12,37 @@ import java.util.Scanner;
 public class HdfsUtil {
     private FileSystem fs;
     private Scanner sc = new Scanner(System.in);
+    private boolean idHadoopRunning(String host,int port)throws Exception{
+        try(java.net.Socket socket = new java.net.Socket(host, port)){
+            socket.connect(new java.net.InetSocketAddress(host, port),500);
+            return true;
+        }catch(Exception e){
+            return false;
+        }
+    }
+    private void startHadoop() throws Exception{ 
+        System.out.println("检测集群状态并尝试启动");
+        ProcessBuilder pb =new ProcessBuilder("bash","-c","start-all.sh");
+        pb.redirectErrorStream(true);
+        Process p = pb.start();
+        try(BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()))){
+            String line;
+            while((line=br.readLine())!=null){
+                System.out.println("[Hadoop Shell"+line);
+            }
+        }
+        p.waitFor();
+    }
     public HdfsUtil() throws Exception {
         try{
+            if(idHadoopRunning("localhost",9000)){
+                System.out.println("集群已启动");
+            }else{
+                System.out.println("集群未启动，尝试启动");
+                startHadoop();
+                Thread.sleep(5000);
+            }            
+
             Configuration conf = new Configuration();
             conf.set("dfs.support.append", "true");
             URI uri = new URI("hdfs://localhost:9000");
