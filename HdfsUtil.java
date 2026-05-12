@@ -13,7 +13,7 @@ public class HdfsUtil {
     private FileSystem fs;
     private Scanner sc = new Scanner(System.in);
     private boolean idHadoopRunning(String host,int port)throws Exception{
-        try(java.net.Socket socket = new java.net.Socket(host, port)){
+        try(java.net.Socket socket = new java.net.Socket()){
             socket.connect(new java.net.InetSocketAddress(host, port),500);
             return true;
         }catch(Exception e){
@@ -45,6 +45,8 @@ public class HdfsUtil {
 
             Configuration conf = new Configuration();
             conf.set("dfs.support.append", "true");
+            conf.set("dfs.client.block.write.replace-datanode-on-failure.enable", "true");
+            conf.set("dfs.client.block.write.replace-datanode-on-failure.policy", "NEVER");
             URI uri = new URI("hdfs://localhost:9000");
             fs = FileSystem.get(uri, conf, "guojia");
             System.out.println("连接并初始化成功");
