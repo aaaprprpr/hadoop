@@ -40,7 +40,7 @@ public class HdfsUtil {
             }else{
                 System.out.println("集群未启动，尝试启动");
                 startHadoop();
-                Thread.sleep(5000);
+                Thread.sleep(20000);
             }            
 
             Configuration conf = new Configuration();
@@ -49,6 +49,13 @@ public class HdfsUtil {
             conf.set("dfs.client.block.write.replace-datanode-on-failure.policy", "NEVER");
             URI uri = new URI("hdfs://localhost:9000");
             fs = FileSystem.get(uri, conf, "guojia");
+            // 强制退出安全模式
+            if (fs instanceof org.apache.hadoop.hdfs.DistributedFileSystem) {
+                org.apache.hadoop.hdfs.DistributedFileSystem adminFs = (org.apache.hadoop.hdfs.DistributedFileSystem) fs;
+                // 设置安全模式动作为 LEAVE（离开）
+                adminFs.setSafeMode(org.apache.hadoop.hdfs.protocol.HdfsConstants.SafeModeAction.SAFEMODE_LEAVE);
+                System.out.println("检测并强制退出 HDFS 安全模式成功。");
+            }
             System.out.println("连接并初始化成功");
         }catch(Exception e){
             e.printStackTrace();
@@ -366,5 +373,8 @@ public class HdfsUtil {
             return false;
         }
         return true;
+    }
+    public FileSystem getFs() {
+        return this.fs;
     }
 }
